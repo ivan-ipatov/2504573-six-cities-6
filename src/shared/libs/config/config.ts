@@ -10,11 +10,13 @@ export function loadConfig(): Config {
       env: 'PORT',
     },
     databaseUrl: {
-      doc: 'The data base server address (valid IP or URL).',
+      doc: 'The data base server address (URL or IP).',
       format: (val: string) => {
-        const ipRegex = /^(mongodb:\/\/)?(\d{1,3}\.){3}\d{1,3}:\d{1,5}\/\w+$/;
-        if (!ipRegex.test(val)) {
-          throw new Error('Invalid database URL format. Expected: mongodb://IP:port/database');
+        // Simple URL validation
+        try {
+          new URL(val);
+        } catch {
+          throw new Error('Invalid URL');
         }
       },
       default: 'mongodb://127.0.0.1:27017/six-cities',

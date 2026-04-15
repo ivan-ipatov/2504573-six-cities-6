@@ -1,6 +1,6 @@
 import { createWriteStream } from 'node:fs';
 import { Writable } from 'node:stream';
-import { Offer } from '../types/offer.type.js';
+import { Offer } from '../shared/types/index.js';
 
 /**
  * Service for writing offers to TSV file using streams
