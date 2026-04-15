@@ -2,6 +2,11 @@ import { defaultClasses, getModelForClass, modelOptions, prop } from '@typegoose
 import { User } from '../../types/index.js';
 import { createSHA256 } from '../../helpers/hash.js';
 
+export enum UserType {
+  Regular = 'regular',
+  Pro = 'pro'
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface UserEntity extends defaultClasses.Base {}
 
@@ -26,6 +31,13 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
 
   @prop({ required: true, default: '' })
   private password?: string;
+
+  @prop({
+    type: () => String,
+    enum: UserType,
+    default: UserType.Regular
+  })
+  public userType!: UserType;
 
   constructor(userData?: User) {
     super();
