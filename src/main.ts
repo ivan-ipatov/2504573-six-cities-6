@@ -6,9 +6,10 @@ import { Application } from './app/application.js';
 const container = createContainer();
 const application = container.get<Application>(Application);
 
-application.init().catch((error) => {
-  console.error('Failed to initialize application:', error);
-  process.exit(1);
-});
+// Get CLI arguments (skip node and script path)
+const cliArgs = process.argv.slice(2);
+
+// Run application with CLI arguments
+await application.run(cliArgs, container);
 
 
