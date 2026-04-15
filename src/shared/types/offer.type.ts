@@ -1,10 +1,6 @@
-export type City =
-  | 'Paris'
-  | 'Cologne'
-  | 'Brussels'
-  | 'Amsterdam'
-  | 'Hamburg'
-  | 'Dusseldorf';
+import { City } from './offer-type.enum.js';
+
+export { City };
 
 export type Offer = {
   title: string;

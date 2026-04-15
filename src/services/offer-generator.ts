@@ -1,4 +1,4 @@
-import { Offer, City } from '../shared/types/index.js';
+import { Offer, City, OfferType } from '../shared/types/index.js';
 import { MockOffer } from '../shared/types/index.js';
 import { RandomGenerator } from '../utils/random-generator.js';
 
@@ -7,19 +7,19 @@ import { RandomGenerator } from '../utils/random-generator.js';
  */
 export class OfferGenerator {
   private readonly cities: City[] = [
-    'Paris',
-    'Cologne',
-    'Brussels',
-    'Amsterdam',
-    'Hamburg',
-    'Dusseldorf',
+    City.Paris,
+    City.Cologne,
+    City.Brussels,
+    City.Amsterdam,
+    City.Hamburg,
+    City.Dusseldorf,
   ];
 
-  private readonly propertyTypes: Array<'apartment' | 'house' | 'room' | 'hotel'> = [
-    'apartment',
-    'house',
-    'room',
-    'hotel',
+  private readonly propertyTypes: OfferType[] = [
+    OfferType.Apartment,
+    OfferType.House,
+    OfferType.Room,
+    OfferType.Hotel,
   ];
 
   private readonly facilitiesPool = [
@@ -50,7 +50,7 @@ export class OfferGenerator {
       isPremium: Math.random() > 0.5,
       isFavorite: false,
       rating: RandomGenerator.getRandomDecimal(3.5, 5.0),
-      type: RandomGenerator.getRandomElement(this.propertyTypes),
+      type: RandomGenerator.getRandomElement(this.propertyTypes) as unknown as 'apartment' | 'house' | 'room' | 'hotel',
       rooms: RandomGenerator.getRandomNumber(1, 5),
       guests: RandomGenerator.getRandomNumber(1, 10),
       price: RandomGenerator.getRandomNumber(25, 500),

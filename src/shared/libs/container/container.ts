@@ -10,6 +10,8 @@ import { CategoryService } from '../../modules/category/category-service.interfa
 import { DefaultCategoryService, CategoryEntity, CategoryModel } from '../../modules/category/index.js';
 import { OfferService } from '../../modules/offer/offer-service.interface.js';
 import { DefaultOfferService, OfferEntity, OfferModel } from '../../modules/offer/index.js';
+import { CommentService } from '../../modules/comment/comment-service.interface.js';
+import { DefaultCommentService, CommentEntity, CommentModel } from '../../modules/comment/index.js';
 import { types } from '@typegoose/typegoose';
 
 export function createContainer(): Container {
@@ -29,11 +31,13 @@ export function createContainer(): Container {
   container.bind<types.ModelType<UserEntity>>(Component.UserModel).toConstantValue(UserModel);
   container.bind<types.ModelType<CategoryEntity>>(Component.CategoryModel).toConstantValue(CategoryModel);
   container.bind<types.ModelType<OfferEntity>>(Component.OfferModel).toConstantValue(OfferModel);
+  container.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
 
   // Bind services
   container.bind<UserService>(Component.UserService).to(DefaultUserService).inSingletonScope();
   container.bind<CategoryService>(Component.CategoryService).to(DefaultCategoryService).inSingletonScope();
   container.bind<OfferService>(Component.OfferService).to(DefaultOfferService).inSingletonScope();
+  container.bind<CommentService>(Component.CommentService).to(DefaultCommentService).inSingletonScope();
 
   // Bind application
   container.bind<Application>(Application).toSelf().inSingletonScope();
