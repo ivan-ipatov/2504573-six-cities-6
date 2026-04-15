@@ -1,6 +1,6 @@
 # Личный проект «Шесть городов»
 
-* Студент: [Владислав Морев](https://up.htmlacademy.ru/univer-nodejs-api/6/user/2503307).
+* Студент: [Ипатов Иван](https://up.htmlacademy.ru/univer-nodejs-api/6/user/2504573).
 * Наставник: Глеб Клецков
 
 ---
