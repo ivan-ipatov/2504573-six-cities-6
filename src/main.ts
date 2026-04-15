@@ -154,7 +154,6 @@ export class HelpCommand implements Command {
     `);
   }
 }
-
 export class ImportCommand implements Command {
   public getName(): string {
     return '--import';
