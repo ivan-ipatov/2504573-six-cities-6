@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { injectable, inject } from 'inversify';
 import { Logger } from '../shared/libs/logger/index.js';
 import { Config } from '../shared/libs/config/index.js';
+import { connectDatabase } from '../shared/libs/database/database.js';
 
 @injectable()
 export class Application {
@@ -10,7 +11,8 @@ export class Application {
     @inject('Config') private config: Config,
   ) {}
 
-  init(): void {
+  async init(): Promise<void> {
+    await connectDatabase(this.config.databaseUrl, this.logger);
     this.logger.info('Application initialized');
     this.logger.info(`Server listening on port ${this.config.port}`);
   }
