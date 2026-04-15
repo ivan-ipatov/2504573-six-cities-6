@@ -1,7 +1,13 @@
-import { prop, modelOptions } from '@typegoose/typegoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-@modelOptions({ schemaOptions: { timestamps: true, _id: true } })
-export class CategoryEntity {
-  @prop({ required: true, unique: true })
-  public name!: string;
+export interface ICategory extends Document {
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
+const CategorySchema = new Schema<ICategory>({
+  name: { type: String, required: true, unique: true },
+}, { timestamps: true });
+
+export const CategoryModel = mongoose.model<ICategory>('Category', CategorySchema);

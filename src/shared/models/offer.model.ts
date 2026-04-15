@@ -1,59 +1,44 @@
-import { prop, modelOptions } from '@typegoose/typegoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export type City =
-  | 'Paris'
-  | 'Cologne'
-  | 'Brussels'
-  | 'Amsterdam'
-  | 'Hamburg'
-  | 'Dusseldorf';
-
+export type City = 'Paris' | 'Cologne' | 'Brussels' | 'Amsterdam' | 'Hamburg' | 'Dusseldorf';
 export type PropertyType = 'apartment' | 'house' | 'room' | 'hotel';
 
-@modelOptions({ schemaOptions: { timestamps: true, _id: true } })
-export class OfferEntity {
-  @prop({ required: true })
-  public title!: string;
-
-  @prop({ required: true })
-  public description!: string;
-
-  @prop({ required: true })
-  public postDate!: Date;
-
-  @prop({ required: true, enum: ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'] })
-  public city!: City;
-
-  @prop({ required: true })
-  public previewImage!: string;
-
-  @prop({ required: true, type: () => [String] })
-  public images!: string[];
-
-  @prop({ required: true, default: false })
-  public isPremium!: boolean;
-
-  @prop({ required: true, default: false })
-  public isFavorite!: boolean;
-
-  @prop({ required: true })
-  public rating!: number;
-
-  @prop({ required: true, enum: ['apartment', 'house', 'room', 'hotel'] })
-  public type!: PropertyType;
-
-  @prop({ required: true })
-  public rooms!: number;
-
-  @prop({ required: true })
-  public guests!: number;
-
-  @prop({ required: true })
-  public price!: number;
-
-  @prop({ required: true, type: () => [String] })
-  public facilities!: string[];
-
-  @prop({ required: true, ref: 'UserEntity' })
-  public author!: string;
+export interface IOffer extends Document {
+  title: string;
+  description: string;
+  postDate: Date;
+  city: City;
+  previewImage: string;
+  images: string[];
+  isPremium: boolean;
+  isFavorite: boolean;
+  rating: number;
+  type: PropertyType;
+  rooms: number;
+  guests: number;
+  price: number;
+  facilities: string[];
+  author: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
+const OfferSchema = new Schema<IOffer>({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  postDate: { type: Date, required: true },
+  city: { type: String, enum: ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'], required: true },
+  previewImage: { type: String, required: true },
+  images: { type: [String], required: true },
+  isPremium: { type: Boolean, default: false },
+  isFavorite: { type: Boolean, default: false },
+  rating: { type: Number, required: true },
+  type: { type: String, enum: ['apartment', 'house', 'room', 'hotel'], required: true },
+  rooms: { type: Number, required: true },
+  guests: { type: Number, required: true },
+  price: { type: Number, required: true },
+  facilities: { type: [String], required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+}, { timestamps: true });
+
+export const OfferModel = mongoose.model<IOffer>('Offer', OfferSchema);

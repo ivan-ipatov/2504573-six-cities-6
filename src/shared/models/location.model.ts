@@ -1,10 +1,15 @@
-import { prop, modelOptions } from '@typegoose/typegoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-@modelOptions({ schemaOptions: { timestamps: true, _id: true } })
-export class LocationEntity {
-  @prop({ required: true })
-  public latitude!: number;
-
-  @prop({ required: true })
-  public longitude!: number;
+export interface ILocation extends Document {
+  latitude: number;
+  longitude: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
+const LocationSchema = new Schema<ILocation>({
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
+}, { timestamps: true });
+
+export const LocationModel = mongoose.model<ILocation>('Location', LocationSchema);

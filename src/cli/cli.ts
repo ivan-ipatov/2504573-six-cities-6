@@ -6,8 +6,7 @@ import pino from 'pino';
 import { OfferGenerator } from '../services/offer.service.js';
 import { DataFetcherService } from '../services/data-fetcher.service.js';
 import { TSVWriter } from '../services/tsv-writer.js';
-import { getModelForClass } from '@typegoose/typegoose';
-import { OfferEntity } from '../shared/models/index.js';
+import { OfferModel } from '../shared/models/index.js';
 import { connectDatabase, disconnectDatabase } from '../shared/libs/database/database.js';
 
 type ParsedOffer = {
@@ -104,8 +103,7 @@ export const runCLI = async (args: string[]): Promise<void> => {
 
       console.log(chalk.yellow(`Импорт ${offers.length} предложений...`));
 
-      const offerModel = getModelForClass(OfferEntity);
-      await offerModel.insertMany(offers);
+      await OfferModel.insertMany(offers);
 
       console.log(chalk.green(`✓ Импортировано ${offers.length} предложений в БД`));
 
