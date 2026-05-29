@@ -6,114 +6,97 @@ import { DocumentType, types } from '@typegoose/typegoose';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
-import { DEFAULT_OFFER_COUNT } from './offer.constant.js';
-import { CategoryEntity } from '../category/category.entity.js';
-import { Types } from 'mongoose';
+import { CommentService } from '../comment/comment-service.interface.js';
+import { FavoriteService } from '../favorite/favorite-service.interface.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
-    @inject(Component.CategoryModel) private readonly categoryModel: types.ModelType<CategoryEntity>
+    @inject(Component.CommentService) private readonly commentService: CommentService,
+    @inject(Component.FavoriteService) private readonly favoriteService: FavoriteService,
   ) {}
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    const categoriesIds = Array.isArray(dto.categories) ? dto.categories : [dto.categories];
-    const foundCategories = await this.categoryModel.find({ _id: { $in: categoriesIds }});
-    if (foundCategories.length !== categoriesIds.length) {
-      throw new Error('Some categories not exists');
-    }
-
-    const offerData = {
-      title: dto.title,
-      description: dto.description,
-      postDate: dto.postDate,
-      type: dto.type,
-      price: dto.price,
-      image: dto.image,
-      categories: foundCategories.map((cat) => cat._id),
-      userId: new Types.ObjectId(dto.userId)
-    };
-
-    const result = await this.offerModel.create(offerData);
+    const result = await this.offerModel.create({
+      ...dto,
+      isFavorite: false,
+      commentsCount: 0,
+    });
     this.logger.info(`New offer created: ${dto.title}`);
-
     return result;
   }
 
   public async findById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel
-      .findById(offerId)
-      .populate(['userId', 'categories'])
-      .exec();
+    return this.offerModel.findById(offerId).populate('author').exec();
   }
 
-  public async find(): Promise<DocumentType<OfferEntity>[]> {
+  public async find(limit = 60): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
       .find()
-      .populate(['userId', 'categories'])
+      .sort({ publishedDate: -1 })
+      .limit(limit)
+      .populate('author')
       .exec();
   }
 
-  public async deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async findPremiumByCity(city: string, limit = 3): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
-      .findByIdAndDelete(offerId)
+      .find({ city, isPremium: true })
+      .sort({ publishedDate: -1 })
+      .limit(limit)
+      .populate('author')
       .exec();
   }
 
-  public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
-    const updateData = { ...dto };
-    if (dto.categories) {
-      const categoriesIds = Array.isArray(dto.categories) ? dto.categories : [dto.categories];
-      const foundCategories = await this.categoryModel.find({ _id: { $in: categoriesIds }});
-      if (foundCategories.length !== categoriesIds.length) {
-        throw new Error('Some categories not exists');
-      }
-      (updateData as Record<string, unknown>).categories = foundCategories.map((cat) => cat._id);
+  public async updateById(offerId: string, dto: UpdateOfferDto, userId: string): Promise<DocumentType<OfferEntity> | null> {
+    const offer = await this.offerModel.findById(offerId).exec();
+    if (!offer) {
+      return null;
+    }
+
+    if (offer.author.toString() !== userId) {
+      return null;
     }
 
     return this.offerModel
-      .findByIdAndUpdate(offerId, updateData, {new: true})
-      .populate(['userId', 'categories'])
+      .findByIdAndUpdate(offerId, dto, { new: true })
+      .populate('author')
       .exec();
   }
 
-  public async findByCategoryId(categoryId: string, count?: number): Promise<DocumentType<OfferEntity>[]> {
-    const limit = count ?? DEFAULT_OFFER_COUNT;
+  public async deleteById(offerId: string, userId: string): Promise<boolean> {
+    const offer = await this.offerModel.findById(offerId).exec();
+    if (!offer) {
+      return false;
+    }
+
+    if (offer.author.toString() !== userId) {
+      return false;
+    }
+
+    await this.commentService.deleteByOfferId(offerId);
+    await this.favoriteService.deleteByOfferId(offerId);
+
+    const result = await this.offerModel.deleteOne({ _id: offerId }).exec();
+    return (result.deletedCount ?? 0) > 0;
+  }
+
+  public async findFavorites(userId: string): Promise<DocumentType<OfferEntity>[]> {
+    const offerIds = await this.favoriteService.findOfferIdsByUserId(userId);
+    if (offerIds.length === 0) {
+      return [];
+    }
+
     return this.offerModel
-      .find({categories: categoryId}, {}, {limit})
-      .populate(['userId', 'categories'])
+      .find({ _id: { $in: offerIds } })
+      .sort({ publishedDate: -1 })
+      .populate('author')
       .exec();
   }
 
-  public async exists(documentId: string): Promise<boolean> {
-    return (await this.offerModel
-      .exists({_id: documentId})) !== null;
-  }
-
-  public async incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel
-      .findByIdAndUpdate(offerId, {'$inc': {
-        commentCount: 1,
-      }}).exec();
-  }
-
-  public async findNew(count: number): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find()
-      .sort({ createdAt: -1 })
-      .limit(count)
-      .populate(['userId', 'categories'])
-      .exec();
-  }
-
-  public async findDiscussed(count: number): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find()
-      .sort({ commentCount: -1 })
-      .limit(count)
-      .populate(['userId', 'categories'])
-      .exec();
+  public async setFavorite(userId: string, offerId: string, isFavorite: boolean): Promise<boolean> {
+    return this.favoriteService.toggle(userId, offerId, isFavorite);
   }
 }

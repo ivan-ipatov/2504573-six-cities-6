@@ -1,21 +1,25 @@
-import { City } from './offer-type.enum.js';
+import { HouseType } from './enums/house.type.enum';
+import { AmenitiesType } from './enums/amenities.type.enum';
+import { User } from './user.type';
+import { City } from './city.type';
+import { CoordinatesType } from './coordinates.type';
 
-export { City };
-
-export type Offer = {
+export type OfferType = {
   title: string;
   description: string;
-  postDate: string;
+  publishedDate: Date;
   city: City;
   previewImage: string;
-  images: string[];
+  photos: string[];
   isPremium: boolean;
   isFavorite: boolean;
   rating: number;
-  type: 'apartment' | 'house' | 'room' | 'hotel';
+  type: HouseType;
   rooms: number;
   guests: number;
   price: number;
-  facilities: string[];
-  author: string;
+  amenities: AmenitiesType[];
+  author: User;
+  commentsCount: number;
+  coordinates: CoordinatesType;
 };

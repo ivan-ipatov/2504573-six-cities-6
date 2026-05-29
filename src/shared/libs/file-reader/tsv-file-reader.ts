@@ -1,46 +1,49 @@
-import * as fs from 'node:fs';
-import { EventEmitter } from 'node:events';
+import EventEmitter from 'node:events';
+import { createReadStream } from 'node:fs';
+import { FileReader } from './file-reader.interface.js';
 
-const DEFAULT_CHUNK_SIZE = 16 * 1024; // 16KB
+const CHUNK_SIZE = 16384; // 16KB
 
-export class TSVFileReader extends EventEmitter {
+export class TSVFileReader extends EventEmitter implements FileReader {
   constructor(private readonly filename: string) {
     super();
   }
 
   public async read(): Promise<void> {
-    const stream = fs.createReadStream(this.filename, {
-      highWaterMark: DEFAULT_CHUNK_SIZE,
+    const readStream = createReadStream(this.filename, {
+      highWaterMark: CHUNK_SIZE,
       encoding: 'utf-8',
     });
 
-    let lineBuffer = '';
-    let lineNumber = 0;
+    let remainingData = '';
+    let nextLinePosition = -1;
+    let importedRowCount = 0;
+    let isFirstLine = true;
 
-    stream.on('data', (chunk: string) => {
-      lineBuffer += chunk;
+    try {
+      for await (const chunk of readStream) {
+        remainingData += chunk;
 
-      const lines = lineBuffer.split('\n');
+        while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
+          const completeRow = remainingData.slice(0, nextLinePosition + 1);
+          remainingData = remainingData.slice(++nextLinePosition);
 
-      lineBuffer = lines[lines.length - 1];
+          if (isFirstLine) {
+            isFirstLine = false;
+            continue;
+          }
 
-      for (let i = 0; i < lines.length - 1; i++) {
-        lineNumber++;
-        this.emit('line', lines[i]);
+          importedRowCount++;
+          await new Promise<void>((resolve) => {
+            this.emit('line', completeRow.trim(), resolve);
+          });
+        }
       }
-    });
 
-    stream.on('end', () => {
-      if (lineBuffer.length > 0) {
-        lineNumber++;
-        this.emit('line', lineBuffer);
-      }
-
-      this.emit('end', lineNumber);
-    });
-
-    stream.on('error', (error: NodeJS.ErrnoException) => {
+      this.emit('end', importedRowCount);
+    } catch (error) {
+      console.error(`Error reading file: ${this.filename}`);
       throw error;
-    });
+    }
   }
 }

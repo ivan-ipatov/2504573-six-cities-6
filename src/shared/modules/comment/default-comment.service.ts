@@ -1,87 +1,66 @@
 import { inject, injectable } from 'inversify';
-import { CommentService } from './comment-service.interface.js';
-import { Component } from '../../types/index.js';
-import { Logger } from '../../libs/logger/index.js';
 import { DocumentType, types } from '@typegoose/typegoose';
+import { Logger } from '../../libs/logger/index.js';
+import { Component } from '../../types/index.js';
 import { CommentEntity } from './comment.entity.js';
+import { CommentService } from './comment-service.interface.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
-import { OfferModel } from '../offer/offer.entity.js';
-import { Types } from 'mongoose';
+import { OfferEntity } from '../offer/offer.entity.js';
+import { OfferStats, buildOfferStatsPipeline } from '../offer/offer-utils.js';
+
+const DEFAULT_COMMENTS_LIMIT = 50;
 
 @injectable()
 export class DefaultCommentService implements CommentService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
-    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>
+    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
+    @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
   ) {}
 
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
-    const commentData = {
+    const result = await this.commentModel.create({
       text: dto.text,
       rating: dto.rating,
-      offerId: new Types.ObjectId(dto.offerId),
-      userId: new Types.ObjectId(dto.userId)
-    };
+      authorId: dto.authorId,
+      offerId: dto.offerId,
+    });
 
-    const result = await this.commentModel.create(commentData);
+    await this.recalculateOfferStats(dto.offerId);
+
     this.logger.info(`New comment created for offer: ${dto.offerId}`);
-
-    await this.updateOfferRating(dto.offerId);
-    await this.incrementCommentCount(dto.offerId);
-
     return result;
   }
 
-  public async findByOfferId(offerId: string): Promise<DocumentType<CommentEntity>[]> {
+  public async findByOfferId(offerId: string, limit = DEFAULT_COMMENTS_LIMIT): Promise<DocumentType<CommentEntity>[]> {
     return this.commentModel
-      .find({ offerId: new Types.ObjectId(offerId) })
-      .populate('userId')
+      .find({ offerId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('authorId')
       .exec();
   }
 
-  public async deleteById(commentId: string): Promise<DocumentType<CommentEntity> | null> {
-    const comment = await this.commentModel.findById(commentId).exec();
-    if (!comment) {
-      return null;
-    }
-
-    const offerId = comment.offerId.toString();
-    const result = await this.commentModel.findByIdAndDelete(commentId).exec();
-
-    if (result) {
-      await this.updateOfferRating(offerId);
-      await this.decrementCommentCount(offerId);
-    }
-
-    return result;
+  public async deleteByOfferId(offerId: string): Promise<number> {
+    const result = await this.commentModel.deleteMany({ offerId }).exec();
+    return result.deletedCount ?? 0;
   }
 
-  public async findById(commentId: string): Promise<DocumentType<CommentEntity> | null> {
-    return this.commentModel
-      .findById(commentId)
-      .populate('userId')
-      .exec();
-  }
+  private async recalculateOfferStats(offerId: string): Promise<void> {
+    const [stats] = await this.commentModel.aggregate<OfferStats>(buildOfferStatsPipeline(offerId)).exec();
 
-  private async updateOfferRating(offerId: string): Promise<void> {
-    const comments = await this.commentModel.find({ offerId: new Types.ObjectId(offerId) }).exec();
-
-    if (comments.length === 0) {
-      await OfferModel.findByIdAndUpdate(offerId, { rating: 0 });
+    if (!stats) {
+      await this.offerModel.updateOne(
+        { _id: offerId },
+        { $set: { commentsCount: 0, rating: 0 } }
+      ).exec();
       return;
     }
 
-    const totalRating = comments.reduce((sum: number, comment: CommentEntity) => sum + comment.rating, 0);
-    const averageRating = parseFloat((totalRating / comments.length).toFixed(1));
-
-    await OfferModel.findByIdAndUpdate(offerId, { rating: averageRating });
-  }
-
-  private async incrementCommentCount(offerId: string): Promise<void> {
-    await OfferModel.findByIdAndUpdate(offerId, { $inc: { commentCount: 1 } });
-  }
-
-  private async decrementCommentCount(offerId: string): Promise<void> {
-    await OfferModel.findByIdAndUpdate(offerId, { $inc: { commentCount: -1 } });
+    await this.offerModel.updateOne(
+      { _id: offerId },
+      { $set: { commentsCount: stats.commentsCount, rating: stats.rating } }
+    ).exec();
   }
 }
+
