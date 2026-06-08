@@ -1,13 +1,13 @@
 # Предложения
 ## Получить список предложений
-GET http://localhost:4000/offers?limit=1 HTTP/1.1
+GET http://localhost:8000/offers?limit=1 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Добавить новое предложение
-POST http://localhost:4000/offers HTTP/1.1
+POST http://localhost:8000/offers HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
@@ -43,14 +43,14 @@ Content-Type: application/json
 ###
 
 ## Получить предложение по id
-GET http://localhost:4000/offers/b868e36891d95a5c1b7de124 HTTP/1.1
+GET http://localhost:8000/offers/b868e36891d95a5c1b7de124 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Обновить предложение по id
-PATCH http://localhost:4000/offers/54ce193df9c3c021f3de0d08 HTTP/1.1
+PATCH http://localhost:8000/offers/54ce193df9c3c021f3de0d08 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
@@ -62,47 +62,47 @@ Content-Type: application/json
 ###
 
 ## Удалить предложение по id
-DELETE http://localhost:4000/offers/54ce193df9c3c021f3de0d08 HTTP/1.1
+DELETE http://localhost:8000/offers/54ce193df9c3c021f3de0d08 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Получить список премиальных предложений для города
-GET http://localhost:4000/offers/premium/Paris HTTP/1.1
+GET http://localhost:8000/offers/premium/Paris HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Получить список избранных предложений
-GET http://localhost:4000/offers/favorite HTTP/1.1
+GET http://localhost:8000/offers/favorite HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Добавить предложение в список избранных
-POST http://localhost:4000/offers/b83fa54326a90a3397e94168/favorite HTTP/1.1
+POST http://localhost:8000/offers/b83fa54326a90a3397e94168/favorite HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Удалить предложение из списка избранных
-DELETE http://localhost:4000/offers/b83fa54326a90a3397e94168/favorite HTTP/1.1
+DELETE http://localhost:8000/offers/b83fa54326a90a3397e94168/favorite HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
 ###
 
 ## Список комментариев к объявлению
-GET http://localhost:4000/offers/1a859fe5e0ae17bf9779faa1/comments HTTP/1.1
+GET http://localhost:8000/offers/1a859fe5e0ae17bf9779faa1/comments HTTP/1.1
 
 ###
 
 ## Создать комментарий
-POST http://localhost:4000/offers/1a859fe5e0ae17bf9779faa1/comments HTTP/1.1
+POST http://localhost:8000/offers/1a859fe5e0ae17bf9779faa1/comments HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRvdXJhbnNAb3Zlcmxvb2submV0IiwiaWQiOiI2NjY1ZjBhMWIyY2QxMjM0NTY3ODlhYmMiLCJpYXQiOjE3ODA5MjUzNTAsImV4cCI6MTc4MTAxMTc1MH0.2UmjBNg7mdgwwFFJPxqJ_1_kvUvvEgvnS-X3Kr3TI1k
 Content-Type: application/json
 
