@@ -1,29 +1,29 @@
-import { defaultClasses, getModelForClass, modelOptions, prop, Ref, index } from '@typegoose/typegoose';
-import { UserEntity } from '../user/user.entity.js';
-import { OfferEntity } from '../offer/offer.entity.js';
+import { defaultClasses, getModelForClass, modelOptions, prop, Ref } from '@typegoose/typegoose';
+import { OfferEntity } from '../offer/index.js';
+import { UserEntity } from '../user/index.js';
+
 
 export interface CommentEntity extends defaultClasses.Base {}
 
 @modelOptions({
   schemaOptions: {
     collection: 'comments',
-    timestamps: true,
-  },
+    timestamps: true
+  }
 })
-@index({ offerId: 1, createdAt: -1 })
+
 export class CommentEntity extends defaultClasses.TimeStamps {
-  @prop({ required: true, minlength: 5, maxlength: 1024 })
-  public text!: string;
+  @prop({ required: true, trim: true, minlength: 5, maxlength: 1024 })
+  public text: string;
 
   @prop({ required: true, min: 1, max: 5 })
-  public rating!: number;
+  public rating: number;
 
-  @prop({ ref: UserEntity, required: true })
-  public authorId!: Ref<UserEntity>;
+  @prop({ required: true, ref: OfferEntity })
+  public offerId: Ref<OfferEntity>;
 
-  @prop({ ref: OfferEntity, required: true })
-  public offerId!: Ref<OfferEntity>;
+  @prop({ required: true, ref: UserEntity })
+  public userId: Ref<UserEntity>;
 }
 
 export const CommentModel = getModelForClass(CommentEntity);
-

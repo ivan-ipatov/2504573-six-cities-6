@@ -1,75 +1,53 @@
-import { OfferType, HouseType, AmenitiesType, UserType, City, CoordinatesType, User } from '../types/index.js';
+import { AmenityType, City, HousingImages, HousingType, Location, Offer, UserType } from '../types/index.js';
 
-export function createOffer(offerData: string): OfferType {
-  const [
-    title,
-    description,
-    publishedDateStr,
-    cityName,
-    previewImage,
-    photosStr,
-    isPremiumStr,
-    isFavoriteStr,
-    ratingStr,
-    houseTypeStr,
-    roomsStr,
-    guestsStr,
-    priceStr,
-    amenitiesStr,
-    authorName,
-    authorEmail,
-    authorAvatar,
-    _authorPassword,
-    authorTypeStr,
-    commentsCountStr,
-    coordinatesStr,
-  ] = offerData.split('\t');
+function getEnumValue<T extends Record<string, string>>(enumObject: T, value: string, fieldName: string): T[keyof T] {
+  const enumValue = Object.values(enumObject).find((item) => item === value);
 
-  void _authorPassword;
+  if (!enumValue) {
+    throw new Error(`Invalid ${fieldName}: ${value}`);
+  }
 
-  const [latitudeStr, longitudeStr] = coordinatesStr.split(',');
+  return enumValue as T[keyof T];
+}
 
-  const latitude = Number.parseFloat(latitudeStr);
-  const longitude = Number.parseFloat(longitudeStr);
+function parseHousingImages(value: string): HousingImages {
+  const images = value.split(';');
 
-  const author: User = {
-    name: authorName?.trim() ?? '',
-    email: authorEmail?.trim() ?? '',
-    avatar: authorAvatar?.trim() || undefined,
-    type: authorTypeStr?.trim() as UserType,
+  if (images.length !== 6) {
+    throw new Error(`Invalid housingImages count: ${images.length}`);
+  }
+
+  return images as HousingImages;
+}
+
+export function createOffer(offerData: string): Offer {
+  const [title, description, city, previewImage, images, isPremium, housingType, roomsCount, guestsCount, price, amenities,
+    name, email, userType, location] = offerData.replace('\n', '').split('\t');
+
+  const parseBoolean = (value: string): boolean => value === 'true';
+  const parseInt = (value: string): number => Number.parseInt(value, 10);
+  const parseLocation = (value: string): Location => {
+    const [latitude, longitude] = value.split(';').map(Number);
+    return { latitude, longitude };
   };
 
   return {
-    title: title?.trim() ?? '',
-    description: description?.trim() ?? '',
-    publishedDate: new Date(publishedDateStr),
-    city: {
-      name: cityName?.trim() ?? '',
-      latitude,
-      longitude,
-    } satisfies City,
-    previewImage: previewImage?.trim() ?? '',
-    photos: photosStr
-      ?.split(';')
-      .map((p) => p.trim())
-      .filter(Boolean) ?? [],
-    isPremium: isPremiumStr?.trim().toLowerCase() === 'true',
-    isFavorite: isFavoriteStr?.trim().toLowerCase() === 'true',
-    rating: Number.parseFloat(ratingStr),
-    type: houseTypeStr?.trim() as HouseType,
-    rooms: Number.parseInt(roomsStr, 10),
-    guests: Number.parseInt(guestsStr, 10),
-    price: Number.parseInt(priceStr, 10),
-    amenities: amenitiesStr
-      ?.split(';')
-      .map((a) => a.trim())
-      .filter((a) => Object.values(AmenitiesType).includes(a as AmenitiesType))
-      .map((a) => a as AmenitiesType) ?? [],
-    author,
-    commentsCount: Number.parseInt(commentsCountStr, 10),
-    coordinates: {
-      latitude,
-      longitude,
-    } satisfies CoordinatesType,
+    title,
+    description,
+    city: getEnumValue(City, city, 'city'),
+    previewImage,
+    housingImages: parseHousingImages(images),
+    isPremium: parseBoolean(isPremium),
+    housingType: getEnumValue(HousingType, housingType, 'housingType'),
+    roomsCount: parseInt(roomsCount),
+    guestsCount: parseInt(guestsCount),
+    price: parseInt(price),
+    amenities: amenities.split(';').map((amenity) => getEnumValue(AmenityType, amenity, 'amenity')),
+    author: {
+      name: name,
+      email: email,
+      type: getEnumValue(UserType, userType, 'userType')
+    },
+    location: parseLocation(location)
   };
 }

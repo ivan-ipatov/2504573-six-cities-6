@@ -1,14 +1,14 @@
 export * from './user.type.js';
-export * from './coordinates.type.js';
 export * from './offer.type.js';
-export * from './comment.type.js';
-export * from './city.type.js';
-
-export * from './enums/amenities.type.enum.js';
-export * from './enums/house.type.enum.js';
-export * from './enums/user.type.enum.js';
-export * from './enums/component.enum.js';
-
+export * from './location.type.js';
 export * from './mock-server-data.type.js';
 
+export * from './user-type.enum.js';
+export * from './housing-type.enum.js';
+export * from './amenity-type.enum.js';
+export * from './component.enum.js';
+export * from './sort-type.enum.js';
+export * from './city.enum.js';
+
 export * from './document-exists.interface.js';
+export * from './document-owner.interface.js';

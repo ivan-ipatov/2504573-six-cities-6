@@ -1,70 +1,61 @@
 import { defaultClasses, getModelForClass, modelOptions, prop, Ref } from '@typegoose/typegoose';
-import { UserEntity } from '../user/user.entity.js';
-import { HouseType } from '../../types/enums/house.type.enum.js';
-import { AmenitiesType } from '../../types/enums/amenities.type.enum.js';
+import { AmenityType, City, HousingType } from '../../types/index.js';
+import { UserEntity } from '../user/index.js';
+import { LocationSchema } from './location.schema.js';
 
 export interface OfferEntity extends defaultClasses.Base {}
 
 @modelOptions({
   schemaOptions: {
     collection: 'offers',
-    timestamps: true,
-  },
+    timestamps: true
+  }
 })
 export class OfferEntity extends defaultClasses.TimeStamps {
-  @prop({ required: true, minlength: 10, maxlength: 100 })
-  public title!: string;
+  @prop({ required: true, trim: true, minlength: 10, maxlength: 100 })
+  public title: string;
 
-  @prop({ required: true, minlength: 20, maxlength: 1024 })
-  public description!: string;
+  @prop({ required: true, trim: true, minlength: 20, maxlength: 1024 })
+  public description: string;
 
-  @prop({ required: true })
-  public publishedDate!: Date;
+  @prop({ required: true, trim: true, type: () => String, enum: City })
+  public city: City;
 
-  @prop({ required: true, enum: ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'] })
-  public city!: string;
+  @prop({ required: true, trim: true })
+  public previewImage: string;
 
-  @prop({ required: true })
-  public previewImage!: string;
-
-  @prop({ required: true, type: () => [String], maxlength: 255 })
-  public photos!: string[];
+  @prop({ required: true, type: () => [String] })
+  public housingImages: string[];
 
   @prop({ required: true, default: false })
-  public isPremium!: boolean;
+  public isPremium: boolean;
 
-  @prop({ required: true, default: false })
-  public isFavorite!: boolean;
+  @prop({ required: true, min: 0, max: 5, default: 0 })
+  public rating: number;
 
-  @prop({ required: true, min: 1, max: 5 })
-  public rating!: number;
-
-  @prop({ required: true, enum: HouseType })
-  public type!: HouseType;
+  @prop({ required: true, type: () => String, enum: HousingType })
+  public housingType: HousingType;
 
   @prop({ required: true, min: 1, max: 8 })
-  public rooms!: number;
+  public roomsCount: number;
 
   @prop({ required: true, min: 1, max: 10 })
-  public guests!: number;
+  public guestsCount: number;
 
   @prop({ required: true, min: 100, max: 100000 })
-  public price!: number;
+  public price: number;
 
-  @prop({ required: true, type: () => [String], enum: AmenitiesType })
-  public amenities!: AmenitiesType[];
+  @prop({ required: true, type: () => [String], enum: AmenityType })
+  public amenities: AmenityType[];
 
-  @prop({ ref: UserEntity, required: true })
-  public author!: Ref<UserEntity>;
+  @prop({ required: true, ref: UserEntity })
+  public userId: Ref<UserEntity>;
 
   @prop({ default: 0 })
-  public commentsCount!: number;
+  public commentsCount: number;
 
-  @prop({ required: true, _id: false })
-  public coordinates!: {
-    latitude: number;
-    longitude: number;
-  };
+  @prop({ required: true, _id: false, type: () => LocationSchema })
+  public location: LocationSchema;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

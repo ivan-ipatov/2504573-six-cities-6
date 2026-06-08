@@ -4,19 +4,20 @@ import { setTimeout } from 'node:timers/promises';
 import { DatabaseClient } from './database-client.interface.js';
 import { Component } from '../../types/index.js';
 import { Logger } from '../logger/index.js';
-
-const RETRY_COUNT = 5;
-const RETRY_TIMEOUT = 1000;
+import { Config, RestSchema } from '../config/index.js';
 
 @injectable()
 export class MongoDatabaseClient implements DatabaseClient {
   private mongoose: typeof Mongoose;
   private isConnected: boolean;
+  private readonly config: Config<RestSchema> | null;
 
   constructor(
-    @inject(Component.Logger) private readonly logger: Logger
+    @inject(Component.Logger) private readonly logger: Logger,
+    @inject(Component.Config) config?: Config<RestSchema>
   ) {
     this.isConnected = false;
+    this.config = config ?? null;
   }
 
   public isConnectedToDatabase() {
@@ -28,10 +29,13 @@ export class MongoDatabaseClient implements DatabaseClient {
       throw new Error('MongoDB client already connected');
     }
 
-    this.logger.info('Trying to connect to MongoDB…');
+    const retryCount = this.config?.get('DB_RETRY_COUNT') ?? 5;
+    const retryTimeout = this.config?.get('DB_RETRY_TIMEOUT') ?? 1000;
+
+    this.logger.info('Trying to connect to MongoDB...');
 
     let attempt = 0;
-    while (attempt < RETRY_COUNT) {
+    while (attempt < retryCount) {
       try {
         this.mongoose = await Mongoose.connect(uri);
         this.isConnected = true;
@@ -40,11 +44,11 @@ export class MongoDatabaseClient implements DatabaseClient {
       } catch (error) {
         attempt++;
         this.logger.error(`Failed to connect to the database. Attempt ${attempt}`, error as Error);
-        await setTimeout(RETRY_TIMEOUT);
+        await setTimeout(retryTimeout);
       }
     }
 
-    throw new Error(`Unable to establish database connection after ${RETRY_COUNT}`);
+    throw new Error(`Unable to establish database connection after ${retryCount}`);
   }
 
   public async disconnect(): Promise<void> {
