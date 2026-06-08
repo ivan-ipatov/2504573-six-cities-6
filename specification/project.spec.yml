@@ -1,6 +1,6 @@
 openapi: 3.1.0
 servers:
-  - url: http://localhost:4000
+  - url: http://localhost:8000
     description: "Локальный сервер"
 info:
   title: API сервер для проекта «Шесть городов».
