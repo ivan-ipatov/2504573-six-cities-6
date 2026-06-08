@@ -1,0 +1,78 @@
+{
+  "api": {
+    "titles": [
+      "Cozy room near park",
+      "Modern apartment in city center",
+      "Huge house for parties",
+      "Luxury hotel with a beautiful view",
+      "Family-friendly house with garden",
+      "Quiet apartment for solo travelers"
+    ],
+    "descriptions": [
+      "Spacious modern apartment located in the historical city center with great transport access.",
+      "Comfortable private room near a large city park, perfect for short and long stays.",
+      "Large house ideal for events and parties, featuring a spacious living area and private backyard.",
+      "Elegant hotel offering premium rooms with panoramic city views and top-class service.",
+      "Perfect accommodation for families, with a safe yard, multiple bedrooms, and nearby schools.",
+      "Small but cozy studio apartment, ideal for solo travelers or business trips."
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "previewImages": [
+      "http://localhost:4000/static/apartment-01.jpg",
+      "http://localhost:4000/static/apartment-02.jpg",
+      "http://localhost:4000/static/apartment-03.jpg",
+      "http://localhost:4000/static/apartment-04.jpg",
+      "http://localhost:4000/static/apartment-05.jpg",
+      "http://localhost:4000/static/apartment-06.jpg",
+      "http://localhost:4000/static/apartment-07.jpg",
+      "http://localhost:4000/static/apartment-08.jpg",
+      "http://localhost:4000/static/apartment-09.jpg",
+      "http://localhost:4000/static/apartment-10.jpg",
+      "http://localhost:4000/static/apartment-11.jpg"
+    ],
+    "housingImages": [
+      "http://localhost:4000/static/apartment-01.jpg",
+      "http://localhost:4000/static/apartment-02.jpg",
+      "http://localhost:4000/static/apartment-03.jpg",
+      "http://localhost:4000/static/apartment-04.jpg",
+      "http://localhost:4000/static/apartment-05.jpg",
+      "http://localhost:4000/static/apartment-06.jpg",
+      "http://localhost:4000/static/apartment-07.jpg",
+      "http://localhost:4000/static/apartment-08.jpg",
+      "http://localhost:4000/static/apartment-09.jpg",
+      "http://localhost:4000/static/apartment-10.jpg",
+      "http://localhost:4000/static/apartment-11.jpg"
+    ],
+    "users": [
+      "Rick Sanchez",
+      "James McGill",
+      "Walter White",
+      "Morty Smith",
+      "Jesse Pinkman",
+      "Willy Wonka (thx)"
+    ],
+    "emails": [
+      "rick-sanchez@gmail.com",
+      "saul-goodman@gmail.com",
+      "heisenberg@gmail.com",
+      "morty@gmail.com",
+      "wassup@gmail.com",
+      "wanna.more.factories@gmail.com"
+    ],
+    "locations": [
+      [48.8566, 2.3522],
+      [50.9375, 6.9603],
+      [50.8503, 4.3517],
+      [52.3676, 4.9041],
+      [53.5511, 9.9937],
+      [51.2277, 6.7735]
+    ]
+  }
+}
